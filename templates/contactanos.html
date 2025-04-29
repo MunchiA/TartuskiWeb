@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %} - Contáctanos{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/contactanos_style.css') }}">
+
+{% endblock %}
+
+{% block content %}
+<section class="contact-hero">
+    <div class="contact-hero-content">
+        <h1>Contáctanos</h1>
+        <p>Estamos aquí para ayudarte con todas tus necesidades tecnológicas</p>
+    </div>
+</section>
+
+<section class="contact-info">
+    <div class="container">
+        <div class="info-container">
+            <div class="info-card">
+                <i class="fas fa-map-marker-alt"></i>
+                <h3>Dirección</h3>
+                <p>Calle Principal 123</p>
+                <p>28001 Madrid, España</p>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-phone"></i>
+                <h3>Teléfono</h3>
+                <p>+34 123 456 789</p>
+                <p>+34 987 654 321</p>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-envelope"></i>
+                <h3>Email</h3>
+                <p>tartuski@tartuski.com</p>
+                <p>IT_tartuski@tartuski.com</p>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-clock"></i>
+                <h3>Horario</h3>
+                <p>Lunes - Viernes: 9:00 - 18:00</p>
+                <p>Sábado - Domingo: !Cerrado¡</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="contact-form-section">
+    <div class="container">
+        <div class="form-map-container">
+            <div class="contact-form">
+                <h2>Envíanos un mensaje</h2>
+                <p>Completa el formulario y nos pondremos en contacto contigo lo antes posible.</p>
+                <form action="#" method="post">
+                    <div class="form-group">
+                        <label for="name">Nombre completo</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Teléfono</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Asunto</label>
+                        <input type="text" id="subject" name="subject" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="service">Servicio de interés</label>
+                        <select id="service" name="service">
+                            <option value="">Selecciona un servicio</option>
+                            <option value="helpdesk">Help Desk</option>
+                            <option value="voip">Telefonía VoIP</option>
+                            <option value="firewall">Firewall</option>
+                            <option value="lan">Redes LAN</option>
+                            <option value="other">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mensaje</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn">Enviar Mensaje</button>
+                    </div>
+                </form>
+            </div>
+            <div class="map">
+                <h2>Nuestra Ubicación</h2>
+                <p>Visítanos en nuestras oficinas centrales.</p>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12143.354760973503!2d-3.7037974302246036!3d40.41677007936128!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2sus!4v1623252524575!5m2!1sen!2sus" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="faq">
+    <div class="container">
+        <h2>Preguntas Frecuentes</h2>
+        <div class="accordion">
+
+            <div class="accordion-item">
+                <input type="checkbox" id="faq1">
+                <label class="accordion-header" for="faq1">
+                    <h3>¿Cuáles son sus horarios de soporte técnico?</h3>
+                    <span class="icon">+</span>
+                </label>
+                <div class="accordion-content">
+                    <p>Nuestro soporte técnico estándar está disponible de lunes a viernes de 9:00 a 18:00. Para clientes con contratos de soporte premium, ofrecemos asistencia 24/7.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <input type="checkbox" id="faq2">
+                <label class="accordion-header" for="faq2">
+                    <h3>¿Ofrecen servicios para pequeñas empresas?</h3>
+                    <span class="icon">+</span>
+                </label>
+                <div class="accordion-content">
+                    <p>Sí, tenemos planes especialmente diseñados para pequeñas empresas que se adaptan a sus necesidades y presupuesto. Contáctenos para obtener más información.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <input type="checkbox" id="faq3">
+                <label class="accordion-header" for="faq3">
+                    <h3>¿Cuánto tiempo tardan en responder a una solicitud de soporte?</h3>
+                    <span class="icon">+</span>
+                </label>
+                <div class="accordion-content">
+                    <p>Nuestro tiempo de respuesta depende del tipo de contrato y la gravedad del problema. Para incidencias críticas, garantizamos una respuesta en menos de 1 hora para clientes con contrato de soporte.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <input type="checkbox" id="faq4">
+                <label class="accordion-header" for="faq4">
+                    <h3>¿Realizan servicios fuera de Madrid?</h3>
+                    <span class="icon">+</span>
+                </label>
+                <div class="accordion-content">
+                    <p>Sí, ofrecemos servicios en toda España. Para servicios presenciales fuera de Madrid, pueden aplicarse gastos de desplazamiento. Consulte con nuestro equipo para más detalles.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="cta-content">
+        <h2>¿Necesitas una respuesta rápida?</h2>
+        <p>Llámanos ahora al +34 123 456 789 para hablar directamente con uno de nuestros técnicos.</p>
+        <a href="tel:+34123456789" class="btn">Llamar Ahora</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const accordionItems = document.querySelectorAll('.accordion-item');
+        
+        accordionItems.forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            const content = item.querySelector('.accordion-content');
+            const icon = item.querySelector('.icon');
+            
+            header.addEventListener('click', function() {
+                content.classList.toggle('active');
+                if (content.classList.contains('active')) {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    icon.textContent = '-';
+                } else {
+                    content.style.maxHeight = '0px';
+                    icon.textContent = '+';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

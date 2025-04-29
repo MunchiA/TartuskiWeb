@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %} - Perfil {% endblock %}
+
+{% block styles %}
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto p-4">
+        <div class="flex flex-col lg:flex-row gap-4">
+            <!-- Tarjeta de perfil -->
+            <div class="lg:w-1/3 w-full">
+                <div class="bg-white p-4 rounded-lg shadow text-center">
+                    <img src="{{ url_for('static', filename='image/default.png') }}" alt="Foto de perfil" class="foto">
+                    <h2 class="text-2xl font-semibold mb-4">{{ user.name }}</h2>
+                    <button id="logoutBtn" class="logout-button">Cerrar Sesión</button>
+                </div>
+            </div>
+            <!-- Lista de eventos -->
+            <div class="lg:w-2/3 w-full">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h2 class="text-xl font-semibold mb-4">Tus Eventos</h2>
+                    <ul id="eventList" class="space-y-2">
+                        <!-- Los eventos se llenarán dinámicamente -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- FullCalendar Locales (para español) -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js"></script>
+
+    <script>
+        // Función global para logout
+        function logout() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                window.location.href = '/logout';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var eventListEl = document.getElementById('eventList');
+
+            // Conectamos el botón de logout
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logout);
+            }
+
+            // Inicializar calendario en segundo plano
+            var calendarEl = document.createElement('div');
+            calendarEl.style.display = 'none';
+            document.body.appendChild(calendarEl);
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                events: JSON.parse(localStorage.getItem('calendarEvents')) || [],
+                locale: 'es'
+            });
+
+            // Rellenar lista de eventos ordenados por fecha
+            function updateEventList() {
+                var events = calendar.getEvents();
+                events.sort((a, b) => new Date(a.start) - new Date(b.start));
+                eventListEl.innerHTML = '';
+
+                if (events.length === 0) {
+                    eventListEl.innerHTML = '<li class="text-gray-500">No hay eventos programados.</li>';
+                    return;
+                }
+
+                events.forEach(event => {
+                    const li = document.createElement('li');
+                    li.className = 'p-2 bg-gray-50 rounded-md';
+
+                    const date = new Date(event.start).toLocaleDateString('es-ES', {
+                        day: '2-digit', month: '2-digit', year: 'numeric'
+                    });
+
+                    const description = event.extendedProps.description || '';
+                    li.innerHTML = `<strong>${event.title}</strong><br>
+                                    <span class="text-sm text-gray-600">${date}</span>` +
+                                   (description ? `<br><span class="text-sm text-gray-500">${description}</span>` : '');
+
+                    eventListEl.appendChild(li);
+                });
+            }
+
+            updateEventList();
+        });
+    </script>
+{% endblock %}

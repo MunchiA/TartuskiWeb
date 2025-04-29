@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %} - Home{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Soluciones Tecnológicas para tu Empresa</h1>
+        <p>Expertos en Help Desk, Telefonía VoIP, Firewall y Redes LAN</p>
+        <a href="/contactanos" class="btn">Solicitar Presupuesto</a>
+    </div>
+</section>
+
+<section class="services-overview">
+    <h2>Nuestros Servicios</h2>
+    <div class="services-container">
+        <div class="service-card">
+            <i class="fas fa-headset"></i>
+            <h3>Help Desk</h3>
+            <p>Soporte técnico remoto y presencial para resolver todas tus dudas.</p>
+            <a href="/servicios#helpdesk" class="btn-small">Más información</a>
+        </div>
+        <div class="service-card">
+            <i class="fas fa-phone-alt"></i>
+            <h3>Telefonía VoIP</h3>
+            <p>Instalación y gestión de sistemas de telefonía IP para una comunicación eficiente.</p>
+            <a href="/servicios#voip" class="btn-small">Más información</a>
+        </div>
+        <div class="service-card">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Firewall</h3>
+            <p>Implementación y configuración de cortafuegos para proteger tu red empresarial.</p>
+            <a href="/servicios#firewall" class="btn-small">Más información</a>
+        </div>
+        <div class="service-card">
+            <i class="fas fa-network-wired"></i>
+            <h3>Redes LAN</h3>
+            <p>Diseño, instalación y puesta en marcha de redes locales seguras y eficientes.</p>
+            <a href="/servicios#lan" class="btn-small">Más información</a>
+        </div>
+    </div>
+</section>
+
+<section class="why-us">
+    <h2>¿Por qué elegirnos?</h2>
+    <div class="features-container">
+        <div class="feature">
+            <i class="fas fa-user-tie"></i>
+            <h3>Profesionales Certificados</h3>
+            <p>Nuestro equipo cuenta con certificaciones en las tecnologías más demandadas.</p>
+        </div>
+        <div class="feature">
+            <i class="fas fa-clock"></i>
+            <h3>Respuesta Rápida</h3>
+            <p>Garantizamos tiempos de respuesta mínimos para resolver tus incidencias.</p>
+        </div>
+        <div class="feature">
+            <i class="fas fa-chart-line"></i>
+            <h3>Soluciones Escalables</h3>
+            <p>Nuestras soluciones crecen con tu empresa, adaptándose a tus necesidades.</p>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="cta-content">
+        <h2>¿Listo para mejorar tu infraestructura tecnológica?</h2>
+        <p>Contáctanos hoy mismo y obtén un diagnóstico gratuito de tus necesidades.</p>
+        <a href="/contactanos" class="btn">Contactar Ahora</a>
+    </div>
+</section>
+{% endblock %}

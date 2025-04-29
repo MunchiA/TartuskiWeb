@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %} - Calendario {% endblock %}
+
+{% block styles %}
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto p-4">
+        <div class="flex flex-col lg:flex-row gap-4 items-stretch">
+            <!-- Calendario -->
+            <div class="lg:w-2/3 w-full">
+                <div id="calendar" class="bg-white rounded-lg shadow min-h-[400px]"></div>
+            </div>
+            <!-- Lista de eventos -->
+            <div class="lg:w-1/3 w-full">
+                <div class="bg-white p-4 rounded-lg shadow min-h-[400px]">
+                    <h2 class="text-xl font-semibold mb-4">Tus Eventos</h2>
+                    <ul id="eventList" class="space-y-2">
+                        <!-- Los eventos se llenarán dinámicamente -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar/editar eventos -->
+    <div id="eventModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+        <div class="modal-content bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 id="modalTitle" class="text-xl font-semibold mb-6">Agregar Evento</h2>
+            <div class="mb-4">
+                <label for="eventTitle" class="block text-sm font-medium text-gray-700">Título</label>
+                <input type="text" id="eventTitle" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <p id="titleError" class="error-message text-red-500 text-sm mt-1 hidden">El título es obligatorio</p>
+            </div>
+            <div class="mb-4">
+                <label for="eventDescription" class="block text-sm font-medium text-gray-700">Descripción (opcional)</label>
+                <textarea id="eventDescription" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="3"></textarea>
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button id="cancelButton" class="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition">Cancelar</button>
+                <button id="saveButton" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">Guardar</button>
+                <button id="deleteButton" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition hidden">Eliminar</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- FullCalendar Locales (para español) -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var eventListEl = document.getElementById('eventList');
+            var eventColors = ['#22c55e', '#f97316']; // Verde y Naranja
+            var colorIndex = 0;
+            var selectedDate = null;
+            var eventId = null;
+
+            // Cargar eventos desde localStorage
+            var savedEvents = JSON.parse(localStorage.getItem('calendarEvents')) || [];
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'es',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: savedEvents,
+                dateClick: function(info) {
+                    console.log('Clic en fecha:', info.dateStr);
+                    selectedDate = info.dateStr;
+                    openModal('Agregar Evento');
+                },
+                eventClick: function(info) {
+                    console.log('Clic en evento:', info.event);
+                    selectedDate = info.event.startStr.split('T')[0];
+                    openModal('Editar Evento', info.event.title, info.event.id, info.event.extendedProps.description);
+                },
+                eventsSet: function() {
+                    updateEventList();
+                    saveEvents();
+                }
+            });
+            calendar.render();
+            console.log('Calendario inicializado');
+
+            // Modal handling
+            var modal = document.getElementById('eventModal');
+            var modalTitle = document.getElementById('modalTitle');
+            var titleError = document.getElementById('titleError');
+            var saveButton = document.getElementById('saveButton');
+            var cancelButton = document.getElementById('cancelButton');
+            var deleteButton = document.getElementById('deleteButton');
+
+            function openModal(title, titleValue = '', id = null, description = '') {
+                console.log('Abriendo modal:', { title, titleValue, id, description });
+                modalTitle.textContent = title;
+                document.getElementById('eventTitle').value = titleValue;
+                document.getElementById('eventDescription').value = description || '';
+                titleError.classList.add('hidden');
+                eventId = id;
+                deleteButton.classList.toggle('hidden', !id);
+                modal.classList.remove('hidden');
+                document.getElementById('eventTitle').focus();
+            }
+
+            function closeModal() {
+                console.log('Cerrando modal');
+                modal.classList.add('hidden');
+                document.getElementById('eventTitle').value = '';
+                document.getElementById('eventDescription').value = '';
+                titleError.classList.add('hidden');
+                eventId = null;
+            }
+
+            function updateEventList() {
+                console.log('Actualizando lista de eventos');
+                var events = calendar.getEvents();
+                // Ordenar eventos por fecha de inicio (ascendente)
+                events.sort(function(a, b) {
+                    return new Date(a.start) - new Date(b.start);
+                });
+                eventListEl.innerHTML = '';
+                if (events.length === 0) {
+                    eventListEl.innerHTML = '<li class="text-gray-500">No hay eventos programados.</li>';
+                    return;
+                }
+                events.forEach(function(event) {
+                    var li = document.createElement('li');
+                    li.className = 'p-2 bg-gray-50 rounded-md';
+                    var date = new Date(event.start).toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+                    var description = event.extendedProps.description || '';
+                    li.innerHTML = `<strong>${event.title}</strong><br><span class="text-sm text-gray-600">${date}</span>` + (description ? `<br><span class="text-sm text-gray-500">${description}</span>` : '');
+                    eventListEl.appendChild(li);
+                });
+            }
+
+            function saveEvents() {
+                var events = calendar.getEvents().map(function(event) {
+                    return {
+                        id: event.id,
+                        title: event.title,
+                        start: event.start.toISOString(),
+                        allDay: event.allDay,
+                        backgroundColor: event.backgroundColor,
+                        borderColor: event.borderColor,
+                        description: event.extendedProps.description || ''
+                    };
+                });
+                localStorage.setItem('calendarEvents', JSON.stringify(events));
+                console.log('Eventos guardados en localStorage:', events);
+            }
+
+            saveButton.addEventListener('click', function() {
+                console.log('Clic en Guardar');
+                var title = document.getElementById('eventTitle').value.trim();
+                var description = document.getElementById('eventDescription').value.trim();
+
+                if (!title) {
+                    titleError.classList.remove('hidden');
+                    console.log('Error: Título vacío');
+                    return;
+                }
+
+                if (!selectedDate) {
+                    console.log('Error: Fecha no seleccionada');
+                    alert('Error: No se ha seleccionado una fecha');
+                    return;
+                }
+
+                var color = eventColors[colorIndex % 2];
+                colorIndex++;
+
+                console.log('Intentando guardar evento:', { id: eventId, title, start: selectedDate, allDay: true, color, description });
+
+                try {
+                    if (eventId) {
+                        var event = calendar.getEventById(eventId);
+                        if (!event) {
+                            console.error('Evento no encontrado:', eventId);
+                            alert('Error: Evento no encontrado');
+                            return;
+                        }
+                        event.setProp('title', title);
+                        event.setStart(selectedDate);
+                        event.setProp('backgroundColor', color);
+                        event.setProp('borderColor', color);
+                        event.setExtendedProp('description', description);
+                        console.log('Evento actualizado:', event);
+                    } else {
+                        var newEvent = {
+                            id: Date.now().toString(),
+                            title: title,
+                            start: selectedDate,
+                            allDay: true,
+                            backgroundColor: color,
+                            borderColor: color,
+                            description: description
+                        };
+                        calendar.addEvent(newEvent);
+                        console.log('Evento añadido:', newEvent);
+                    }
+                    closeModal();
+                    alert('Evento guardado con éxito');
+                    updateEventList();
+                    saveEvents();
+                } catch (error) {
+                    console.error('Error al guardar el evento:', error);
+                    alert('Error al guardar el evento: ' + error.message);
+                }
+            });
+
+            deleteButton.addEventListener('click', function() {
+                console.log('Clic en Eliminar');
+                if (eventId) {
+                    var event = calendar.getEventById(eventId);
+                    if (event) {
+                        event.remove();
+                        console.log('Evento eliminado:', eventId);
+                    }
+                }
+                closeModal();
+                updateEventList();
+                saveEvents();
+            });
+
+            cancelButton.addEventListener('click', function() {
+                console.log('Clic en Cancelar');
+                closeModal();
+            });
+
+            // Cerrar modal al hacer clic fuera
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    console.log('Clic fuera del modal');
+                    closeModal();
+                }
+            });
+        });
+    </script>
+{% endblock %}

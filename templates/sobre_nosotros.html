@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %} - Sobre Nosotros{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sobre_nosotros_style.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="about-hero">
+    <div class="about-hero-content">
+        <h1>Sobre Nosotros</h1>
+        <p>Conoce quiénes somos y nuestra misión de transformar la tecnología empresarial</p>
+    </div>
+</section>
+
+<section class="our-story">
+    <div class="container">
+        <h2>Nuestra Historia</h2>
+        <div class="story-content">
+            <div class="story-text">
+                <p>Fundada en 2020, Tartuski nació con la visión de proporcionar soluciones tecnológicas accesibles y eficientes para empresas de todos los tamaños. Lo que comenzó como un pequeño equipo de técnicos apasionados, ha crecido hasta convertirse en una empresa líder en el sector de servicios IT.</p>
+                <p>A lo largo de los años, hemos ayudado a cientos de empresas a optimizar sus infraestructuras tecnológicas, mejorar su seguridad y aumentar su productividad mediante la implementación de soluciones personalizadas.</p>
+                <p>Nuestro compromiso con la excelencia y la satisfacción del cliente nos ha permitido establecer relaciones duraderas con nuestros clientes, quienes confían en nosotros para mantener y mejorar sus sistemas tecnológicos.</p>
+            </div>
+            <div class="story-image">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Equipo de IT Solutions">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mission-vision">
+    <div class="container">
+        <div class="mission">
+            <h2>Nuestra Misión</h2>
+            <p>Proporcionar soluciones tecnológicas innovadoras y de alta calidad que permitan a nuestros clientes optimizar sus procesos, aumentar su seguridad y alcanzar sus objetivos empresariales.</p>
+        </div>
+        <div class="vision">
+            <h2>Nuestra Visión</h2>
+            <p>Ser reconocidos como líderes en la industria de servicios IT, destacando por nuestra excelencia técnica, servicio al cliente excepcional y soluciones tecnológicas vanguardistas.</p>
+        </div>
+    </div>
+</section>
+
+<section class="values">
+    <div class="container">
+        <h2>Nuestros Valores</h2>
+        <div class="values-container">
+            <div class="value-card">
+                <i class="fas fa-handshake"></i>
+                <h3>Integridad</h3>
+                <p>Actuamos con honestidad y transparencia en todas nuestras interacciones con clientes y colaboradores.</p>
+            </div>
+            <div class="value-card">
+                <i class="fas fa-lightbulb"></i>
+                <h3>Innovación</h3>
+                <p>Buscamos constantemente nuevas tecnologías y métodos para ofrecer soluciones más eficientes y efectivas.</p>
+            </div>
+            <div class="value-card">
+                <i class="fas fa-users"></i>
+                <h3>Trabajo en Equipo</h3>
+                <p>Colaboramos estrechamente para aprovechar nuestras diversas habilidades y conocimientos.</p>
+            </div>
+            <div class="value-card">
+                <i class="fas fa-star"></i>
+                <h3>Excelencia</h3>
+                <p>Nos esforzamos por superar las expectativas en cada proyecto que emprendemos.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="team">
+    <div class="container">
+        <h2>Nuestro Equipo</h2>
+        <div class="team-container">
+            <div class="team-member">
+                <img src="../static/image/jose.jpg" alt="Director Ejecutivo">
+                <h3>Jose Antonio</h3>
+                <p class="position">CEO</p>
+                <p>Con más de 15 años de experiencia en el sector tecnológico, Jose lidera nuestra empresa con visión, pasión y dedicación.</p>
+            </div>
+            <div class="team-member">
+                <img src="../static/image/albert.png" alt="Directora Técnica">
+                <h3>Albert Guillaume</h3>
+                <p class="position">Director Técnico</p>
+                <p>Especialista en redes y seguridad informática, Albert supervisa todos nuestros proyectos técnicos.</p>
+            </div>
+            <div class="team-member">
+                <img src="../static/image/dani.jpg" alt="Jefe de Soporte">
+                <h3>Daniel Simon</h3>
+                <p class="position">Jefe de Soporte</p>
+                <p>Experto en resolución de problemas, Daniel lidera nuestro equipo de soporte técnico.</p>
+            </div>
+            <div class="team-member">
+                <img src="../static/image/Isaac.jpg" alt="Especialista en VoIP">
+                <h3>Isaac Vazquez</h3>
+                <p class="position">Especialista en VoIP</p>
+                <p>Con certificaciones en sistemas de telefonía IP, Ana diseña e implementa soluciones de comunicación eficientes.</p>
+            </div>
+            <div class="team-member">
+                <div aria-label="Orange and tan hamster running in a metal wheel" role="img" class="wheel-and-hamster">
+                    <div class="wheel"></div>
+                    <div class="hamster">
+                        <div class="hamster__body">
+                            <div class="hamster__head">
+                                <div class="hamster__ear"></div>
+                                <div class="hamster__eye"></div>
+                                <div class="hamster__nose"></div>
+                            </div>
+                            <div class="hamster__limb hamster__limb--fr"></div>
+                            <div class="hamster__limb hamster__limb--fl"></div>
+                            <div class="hamster__limb hamster__limb--br"></div>
+                            <div class="hamster__limb hamster__limb--bl"></div>
+                            <div class="hamster__tail"></div>
+                        </div>
+                    </div>
+                    <div class="spoke"></div>
+                </div>
+                <h3>Hamsterini Ruedini</h3>
+                <p class="position">Mascota de la empresa</p>
+                <p>Mascota de la empresa, ayuda a tomar decisiones de cierta forma.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="cta-content">
+        <h2>¿Quieres formar parte de nuestro equipo?</h2>
+        <p>Estamos siempre en busca de talento apasionado por la tecnología.</p>
+        <a href="/contactanos" class="btn">Envía tu CV</a>
+    </div>
+</section>
+{% endblock %}
