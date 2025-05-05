@@ -3,3 +3,6 @@ _rutas
 _pycache_
 .vscode
 amazon.txt
+__pycache__
+*.pyc
+probar_calendario.txt
