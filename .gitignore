@@ -6,3 +6,4 @@ amazon.txt
 __pycache__
 *.pyc
 backup
+venv/
