@@ -1,6 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, session, request, jsonify, g, flash
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
+from .vscode.email_utils import enviar_correo_contacto
 import os
 import secrets
 import MySQLdb
@@ -41,18 +42,16 @@ azure = oauth.register(
     client_kwargs={'scope': 'openid profile email User.Read'},
 )
 
-# Configuración de la base de datos MySQL desde .env
-db = MySQLdb.connect(
-    host=os.getenv('DB_HOST'),
-    user=os.getenv('DB_USER'),
-    passwd=os.getenv('DB_PASS'),
-    db=os.getenv('DB_NAME')
-)
-
 # Función para obtener la conexión a la base de datos
 def get_db():
+    # Si no existe la conexión en el objeto global, la creamos
     if not hasattr(g, 'db'):
-        g.db = db
+        g.db = MySQLdb.connect(
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            passwd=os.getenv('DB_PASS'),
+            db=os.getenv('DB_NAME')
+        )
     return g.db
 
 # Cerrar la conexión a la base de datos después de cada solicitud
@@ -74,6 +73,7 @@ def calendario():
 def obtener_eventos():
     if not session.get('user'):
         return jsonify({'status': 'error', 'message': 'No autenticado'}), 401
+
     cursor = get_db().cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("""
         SELECT e.id, e.titulo, e.descripcion, e.fecha_inicio, e.fecha_fin, u.nombre as creator
@@ -82,6 +82,55 @@ def obtener_eventos():
     """)
     events = cursor.fetchall()
     cursor.close()
+    
+    formatted_events = []
+    for ev in events:
+        # Evitar None y convertir a cadena ISO
+        start = ev['fecha_inicio'].strftime('%Y-%m-%dT%H:%M:%S') if ev['fecha_inicio'] else None
+        end   = ev['fecha_fin']     .strftime('%Y-%m-%dT%H:%M:%S') if ev['fecha_fin']     else None
+        formatted_events.append({
+            'id':          ev['id'],
+            'title':       ev['titulo'],
+            'start':       start,
+            'end':         end,
+            'description': ev['descripcion'],
+            'creator':     ev['creator']
+        })
+    return jsonify(formatted_events)
+    
+    # Ruta para crear eventos
+@app.route('/crear-evento', methods=['POST'])
+def crear_evento():
+    if not session.get('user'):
+        return jsonify({'status': 'error', 'message': 'No autenticado'}), 401
+    if not request.is_json:
+        return jsonify({'status': 'error', 'message': 'Solicitud no es JSON'}), 400
+    data = request.get_json()
+    titulo = data.get('titulo', '').strip()
+    descripcion = data.get('descripcion', '').strip()
+    fecha = data.get('fecha', '')
+    hora_inicio = data.get('hora_inicio', '00:00')
+    hora_fin = data.get('hora_fin', '00:00')
+
+    if not titulo or not fecha:
+        return jsonify({'status': 'error', 'message': 'Título y fecha son obligatorios'}), 400
+
+    fecha_inicio = f"{fecha} {hora_inicio}" if hora_inicio else fecha
+    fecha_fin = f"{fecha} {hora_fin}" if hora_fin else fecha
+    azure_user_id = g.user['azure_user_id']
+
+    try:
+        cursor = get_db().cursor()
+        cursor.execute("""
+            INSERT INTO eventos (titulo, descripcion, fecha_inicio, fecha_fin, azure_user_id)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (titulo, descripcion, fecha_inicio, fecha_fin, azure_user_id))
+        get_db().commit()
+        new_event_id = cursor.lastrowid
+        return jsonify({'status': 'success', 'id': new_event_id})
+    except Exception as e:
+        get_db().rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
     
     # Formatear los eventos para FullCalendar
     formatted_events = []
@@ -99,37 +148,20 @@ def obtener_eventos():
     
     return jsonify(formatted_events)
 
-# Ruta para crear eventos
-@app.route('/crear-evento', methods=['POST'])
-def crear_evento():
+# Ruta para ver detalles del evento
+@app.route('/ver-evento/<int:evento_id>')
+def ver_evento(evento_id):
     if not session.get('user'):
-        return jsonify({'status': 'error', 'message': 'No autenticado'}), 401
-    if request.is_json:
-        data = request.get_json()
-        titulo = data.get('titulo')
-        descripcion = data.get('descripcion')
-        fecha_inicio = f"{data.get('fecha')} {data.get('hora_inicio')}" if data.get('hora_inicio') else data.get('fecha')
-        fecha_fin = f"{data.get('fecha')} {data.get('hora_fin')}" if data.get('hora_fin') else data.get('fecha')
-    else:
-        # Fallback por si se accede desde un formulario tradicional
-        titulo = request.form['titulo']
-        descripcion = request.form['descripcion']
-        fecha_inicio = request.form['fecha_inicio'] + ' ' + request.form['hora_inicio']
-        fecha_fin = request.form['fecha_fin'] + ' ' + request.form['hora_fin']
-
-    azure_user_id = g.user['azure_user_id']
-
+        return redirect(url_for('login'))
     try:
         cursor = get_db().cursor()
-        cursor.execute("""
-            INSERT INTO eventos (titulo, descripcion, fecha_inicio, fecha_fin, azure_user_id)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (titulo, descripcion, fecha_inicio, fecha_fin, azure_user_id))
-        get_db().commit()
-        return {"status": "ok"}, 200  # JSON response
+        cursor.execute("SELECT * FROM eventos WHERE id = %s", (evento_id,))
+        evento = cursor.fetchone()
+
+        return render_template('ver_evento.html', evento=evento)
     except Exception as e:
-        get_db().rollback()
-        return {"status": "error", "message": str(e)}, 500
+        flash(f'Error al obtener el evento: {str(e)}', 'danger')
+        return redirect(url_for('home'))
 
 # Ruta principal
 @app.route('/')
@@ -224,22 +256,6 @@ def sobre_nosotros():
 @app.route('/servicios')
 def servicios():
     return render_template('servicios.html')
-
-# Configuración de correo desde .env
-EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')
-EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
-
-@app.route('/contactanos', methods=['GET', 'POST'])
-def contactanos():
-    if request.method == 'POST':
-        nombre = request.form.get('nombre')
-        email = request.form.get('email')
-        telefono = request.form.get('telefono')
-        empresa = request.form.get('empresa')
-        servicio = request.form.get('servicio')
-        mensaje = request.form.get('mensaje')
-        return redirect(url_for('contactanos'))
-    return render_template('contactanos.html')
 
 
 required_env_vars = ['FLASK_SECRET_KEY', 'AZURE_AD_CLIENT_ID', 'AZURE_AD_TENANT_ID', 'AZURE_AD_CLIENT_SECRET', 'DB_HOST', 'DB_USER', 'DB_PASS', 'DB_NAME', 'EMAIL_ADDRESS', 'EMAIL_PASSWORD']
