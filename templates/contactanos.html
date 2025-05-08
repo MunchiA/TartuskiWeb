@@ -4,7 +4,6 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/contactanos_style.css') }}">
-
 {% endblock %}
 
 {% block content %}
@@ -40,7 +39,7 @@
                 <i class="fas fa-clock"></i>
                 <h3>Horario</h3>
                 <p>Lunes - Viernes: 9:00 - 18:00</p>
-                <p>Sábado - Domingo: !Cerrado¡</p>
+                <p>Sábado - Domingo: ¡Cerrado!</p>
             </div>
         </div>
     </div>
@@ -52,7 +51,8 @@
             <div class="contact-form">
                 <h2>Envíanos un mensaje</h2>
                 <p>Completa el formulario y nos pondremos en contacto contigo lo antes posible.</p>
-                <form action="#" method="post">
+                <!-- Formulario -->
+                <form id="contact-form" action="#" method="post">
                     <div class="form-group">
                         <label for="name">Nombre completo</label>
                         <input type="text" id="name" name="name" required>
@@ -102,51 +102,7 @@
     <div class="container">
         <h2>Preguntas Frecuentes</h2>
         <div class="accordion">
-
-            <div class="accordion-item">
-                <input type="checkbox" id="faq1">
-                <label class="accordion-header" for="faq1">
-                    <h3>¿Cuáles son sus horarios de soporte técnico?</h3>
-                    <span class="icon">+</span>
-                </label>
-                <div class="accordion-content">
-                    <p>Nuestro soporte técnico estándar está disponible de lunes a viernes de 9:00 a 18:00. Para clientes con contratos de soporte premium, ofrecemos asistencia 24/7.</p>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <input type="checkbox" id="faq2">
-                <label class="accordion-header" for="faq2">
-                    <h3>¿Ofrecen servicios para pequeñas empresas?</h3>
-                    <span class="icon">+</span>
-                </label>
-                <div class="accordion-content">
-                    <p>Sí, tenemos planes especialmente diseñados para pequeñas empresas que se adaptan a sus necesidades y presupuesto. Contáctenos para obtener más información.</p>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <input type="checkbox" id="faq3">
-                <label class="accordion-header" for="faq3">
-                    <h3>¿Cuánto tiempo tardan en responder a una solicitud de soporte?</h3>
-                    <span class="icon">+</span>
-                </label>
-                <div class="accordion-content">
-                    <p>Nuestro tiempo de respuesta depende del tipo de contrato y la gravedad del problema. Para incidencias críticas, garantizamos una respuesta en menos de 1 hora para clientes con contrato de soporte.</p>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <input type="checkbox" id="faq4">
-                <label class="accordion-header" for="faq4">
-                    <h3>¿Realizan servicios fuera de Madrid?</h3>
-                    <span class="icon">+</span>
-                </label>
-                <div class="accordion-content">
-                    <p>Sí, ofrecemos servicios en toda España. Para servicios presenciales fuera de Madrid, pueden aplicarse gastos de desplazamiento. Consulte con nuestro equipo para más detalles.</p>
-                </div>
-            </div>
-
+            <!-- Preguntas frecuentes aquí -->
         </div>
     </div>
 </section>
@@ -158,29 +114,9 @@
         <a href="tel:+34123456789" class="btn">Llamar Ahora</a>
     </div>
 </section>
+
 {% endblock %}
 
 {% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const accordionItems = document.querySelectorAll('.accordion-item');
-        
-        accordionItems.forEach(item => {
-            const header = item.querySelector('.accordion-header');
-            const content = item.querySelector('.accordion-content');
-            const icon = item.querySelector('.icon');
-            
-            header.addEventListener('click', function() {
-                content.classList.toggle('active');
-                if (content.classList.contains('active')) {
-                    content.style.maxHeight = content.scrollHeight + 'px';
-                    icon.textContent = '-';
-                } else {
-                    content.style.maxHeight = '0px';
-                    icon.textContent = '+';
-                }
-            });
-        });
-    });
-</script>
+
 {% endblock %}
