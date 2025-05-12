@@ -103,6 +103,45 @@
         <h2>Preguntas Frecuentes</h2>
         <div class="accordion">
             <!-- Preguntas frecuentes aquí -->
+            <div class="accordion-item">
+                <label class="accordion-header">
+                    <h3>¿Cuáles son sus horarios de soporte técnico?</h3>
+                    <span class="icon">+</span>
+                </label>
+                <div class="accordion-content">
+                    <p>Nuestro soporte técnico estándar está disponible de lunes a viernes de 9:00 a 18:00...</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <label class="accordion-header" for="faq2">
+                    <h3>¿Ofrecen servicios para pequeñas empresas?</h3>
+                    <span class="icon">+</span>
+                </label>
+                <div class="accordion-content">
+                    <p>Sí, tenemos planes especialmente diseñados para pequeñas empresas que se adaptan a sus necesidades y presupuesto. Contáctenos para obtener más información.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <label class="accordion-header" for="faq3">
+                    <h3>¿Cuánto tiempo tardan en responder a una solicitud de soporte?</h3>
+                    <span class="icon">+</span>
+                </label>
+                <div class="accordion-content">
+                    <p>Nuestro tiempo de respuesta depende del tipo de contrato y la gravedad del problema. Para incidencias críticas, garantizamos una respuesta en menos de 1 hora para clientes con contrato de soporte.</p>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <label class="accordion-header" for="faq4">
+                    <h3>¿Realizan servicios fuera de Madrid?</h3>
+                    <span class="icon">+</span>
+                </label>
+                <div class="accordion-content">
+                    <p>Sí, ofrecemos servicios en toda España. Para servicios presenciales fuera de Madrid, pueden aplicarse gastos de desplazamiento. Consulte con nuestro equipo para más detalles.</p>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -118,5 +157,35 @@
 {% endblock %}
 
 {% block scripts %}
-
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const accordionItems = document.querySelectorAll('.accordion-item');
+    
+        accordionItems.forEach(item => {
+            const header = item.querySelector('.accordion-header');
+            const content = item.querySelector('.accordion-content');
+            const icon = item.querySelector('.icon');
+    
+            header.addEventListener('click', function () {
+                const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+    
+                // Cierra todos
+                accordionItems.forEach(i => {
+                    const c = i.querySelector('.accordion-content');
+                    c.style.maxHeight = null;
+                    c.style.paddingTop = '0';
+                    c.style.paddingBottom = '0';
+                    i.querySelector('.icon').textContent = '+';
+                });
+    
+                if (!isOpen) {
+                    content.style.paddingTop = '15px';
+                    content.style.paddingBottom = '15px';
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    icon.textContent = '-';
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
