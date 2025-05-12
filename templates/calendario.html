@@ -72,86 +72,101 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const calendarEl     = document.getElementById('calendar');
-  const eventModal     = document.getElementById('eventModal');
-  const eventForm      = document.getElementById('eventForm');
-  const cancelButton   = document.getElementById('cancelButton');
-  const eventDateInput = document.getElementById('eventDate');
-  const eventTitle     = document.getElementById('eventTitle');
-  const eventDesc      = document.getElementById('eventDescription');
-  const eventStart     = document.getElementById('eventStartTime');
-  const eventEnd       = document.getElementById('eventEndTime');
-  const eventList      = document.getElementById('eventList');
-  let selectedDate     = '';
-
-  const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    locale: 'es',
-    height: 'auto',
-    headerToolbar: {
-      left:   'prev,next today',
-      center: 'title',
-      right:  'dayGridMonth,timeGridWeek,timeGridDay'
-    },
-    dateClick(info) {
+  document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('calendar');
+    const eventModal = document.getElementById('eventModal');
+    const eventForm = document.getElementById('eventForm');
+    const cancelButton = document.getElementById('cancelButton');
+    const eventDateInput = document.getElementById('eventDate');
+    const eventTitle = document.getElementById('eventTitle');
+    const eventDesc = document.getElementById('eventDescription');
+    const eventStart = document.getElementById('eventStartTime');
+    const eventEnd = document.getElementById('eventEndTime');
+    const eventList = document.getElementById('eventList');
+    let selectedDate = '';
+  
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'es',
+      height: 'auto',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      dateClick(info) {
         selectedDate = info.dateStr;
-        eventForm.reset();               // Primero resetea todo el formulario
+        eventForm.reset(); // Primero resetea todo el formulario
         eventDateInput.value = selectedDate;  // Ahora sí pon la fecha en el input
         eventModal.classList.remove('hidden');
-    },
-    events: '/obtener-eventos',
-    eventsSet(events) {
-      // Cada vez que FullCalendar carga o recarga eventos,
-      // rellenamos la lista lateral
-      eventList.innerHTML = '';
-      events.forEach(ev => {
-        const li = document.createElement('li');
-        li.className = 'text-sm border-b pb-2';
-        li.innerHTML = `
-          <strong>${ev.title}</strong>
-          <br>
-          <span class="text-gray-500 text-xs">
-            ${ev.extendedProps.creator || 'Desconocido'}
-          </span>
-        `;
-        eventList.appendChild(li);
-      });
-    }
-  });
-
-  calendar.render();
-
-  cancelButton.addEventListener('click', () => {
-    eventModal.classList.add('hidden');
-  });
-
-  eventForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    fetch('/crear-evento', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        titulo:      eventTitle.value,
-        descripcion: eventDesc.value,
-        fecha:       eventDateInput.value,
-        hora_inicio: eventStart.value,
-        hora_fin:    eventEnd.value
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === 'success') {
-        calendar.refetchEvents();
-        eventModal.classList.add('hidden');
-      } else {
-        alert(data.message || 'Error al crear el evento');
+      },
+      events: '/obtener-eventos', // Obtiene eventos desde el servidor
+      eventsSet(events) {
+        // Cada vez que FullCalendar carga o recarga eventos,
+        // rellenamos la lista lateral
+        eventList.innerHTML = ''; // Limpiar la lista de eventos antes de agregar nuevos
+  
+        events.forEach(ev => {
+          const li = document.createElement('li');
+          li.className = 'text-sm border-b pb-2';
+  
+          const eventTitleElement = document.createElement('strong');
+          eventTitleElement.textContent = ev.title;
+  
+          const eventCreator = document.createElement('span');
+          eventCreator.className = 'text-gray-500 text-xs';
+          eventCreator.textContent = ev.creator || 'Desconocido';
+  
+          li.appendChild(eventTitleElement);
+          li.appendChild(document.createElement('br'));
+          li.appendChild(eventCreator);
+  
+          eventList.appendChild(li);
+        });
       }
-    })
-    .catch(() => {
-      alert('Error al conectar con el servidor');
+    });
+  
+    calendar.render();
+  
+    cancelButton.addEventListener('click', () => {
+      eventModal.classList.add('hidden');
+    });
+  
+    eventForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      fetch('/crear-evento', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          titulo: eventTitle.value,
+          descripcion: eventDesc.value,
+          fecha: eventDateInput.value,
+          hora_inicio: eventStart.value,
+          hora_fin: eventEnd.value
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'success') {
+            // Agregar el evento dinámicamente en el calendario
+            const newEvent = {
+              id: data.id,
+              title: eventTitle.value,
+              start: eventDateInput.value + 'T' + eventStart.value,
+              end: eventDateInput.value + 'T' + eventEnd.value,
+              description: eventDesc.value,
+              creator: 'Desconocido' // Este es un ejemplo, puedes agregar el creador si lo deseas
+            };
+            calendar.addEvent(newEvent); // Agregar el evento a FullCalendar
+            eventModal.classList.add('hidden');
+          } else {
+            alert(data.message || 'Error al crear el evento');
+          }
+        })
+        .catch(() => {
+          alert('Error al conectar con el servidor');
+        });
     });
   });
-});
 </script>
 {% endblock %}

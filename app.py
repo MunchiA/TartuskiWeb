@@ -8,6 +8,7 @@ import MySQLdb
 from datetime import datetime
 from email.mime.text import MIMEText
 import smtplib
+from datetime import datetime
 
 load_dotenv()
 
@@ -75,30 +76,35 @@ def calendario():
 def obtener_eventos():
     if not session.get('user'):
         return jsonify({'status': 'error', 'message': 'No autenticado'}), 401
-    cursor = get_db().cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("""
-        SELECT e.id, e.titulo, e.descripcion, e.fecha_inicio, e.fecha_fin, u.nombre as creator
-        FROM eventos e
-        JOIN usuarios u ON e.azure_user_id = u.azure_user_id
-    """)
-    events = cursor.fetchall()
-    cursor.close()
     
-    # Formatear los eventos para FullCalendar
-    formatted_events = []
-    for event in events:
-        start = event['fecha_inicio'] if event['fecha_inicio'] else None
-        end = event['fecha_fin'] if event['fecha_fin'] else None
-        formatted_events.append({
-            'id': event['id'],
-            'title': event['titulo'],
-            'start': start,
-            'end': end,
-            'description': event['descripcion'],
-            'creator': event['creator']
-        })
+    try:
+        cursor = get_db().cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("""
+            SELECT e.id, e.titulo, e.descripcion, e.fecha_inicio, e.fecha_fin, u.nombre as creator
+            FROM eventos e
+            JOIN usuarios u ON e.azure_user_id = u.azure_user_id
+        """)
+        events = cursor.fetchall()
+        cursor.close()
+
+        formatted_events = []
+        for event in events:
+            start = event['fecha_inicio'].strftime("%Y-%m-%dT%H:%M:%S") if event['fecha_inicio'] else None
+            end = event['fecha_fin'].strftime("%Y-%m-%dT%H:%M:%S") if event['fecha_fin'] else None
+            formatted_events.append({
+                'id': event['id'],
+                'title': event['titulo'],
+                'start': start,
+                'end': end,
+                'description': event['descripcion'],
+                'creator': event['creator']
+            })
+
+        return jsonify(formatted_events)
     
-    return jsonify(formatted_events)
+    except Exception as e:
+        print(f"Error al obtener eventos: {str(e)}")  # Para ver el error en el log
+        return jsonify({'status': 'error', 'message': 'Error al obtener los eventos'}), 500
 
 # Ruta para crear eventos
 @app.route('/crear-evento', methods=['POST'])
@@ -107,6 +113,8 @@ def crear_evento():
         return jsonify({'status': 'error', 'message': 'No autenticado'}), 401
     if not request.is_json:
         return jsonify({'status': 'error', 'message': 'Solicitud no es JSON'}), 400
+
+    # Obtener datos JSON
     data = request.get_json()
     titulo = data.get('titulo', '').strip()
     descripcion = data.get('descripcion', '').strip()
@@ -114,13 +122,29 @@ def crear_evento():
     hora_inicio = data.get('hora_inicio', '00:00')
     hora_fin = data.get('hora_fin', '00:00')
 
+    # Imprimir los valores recibidos para depuración
+    print(f"Datos recibidos - Título: {titulo}, Descripción: {descripcion}, Fecha: {fecha}, Hora inicio: {hora_inicio}, Hora fin: {hora_fin}")
+
+    # Validar que el título y la fecha sean proporcionados
     if not titulo or not fecha:
         return jsonify({'status': 'error', 'message': 'Título y fecha son obligatorios'}), 400
 
-    fecha_inicio = f"{fecha} {hora_inicio}" if hora_inicio else fecha
-    fecha_fin = f"{fecha} {hora_fin}" if hora_fin else fecha
-    azure_user_id = g.user['azure_user_id']
+    # Crear fechas en formato adecuado
+    try:
+        # Convertir las fechas a formato datetime
+        fecha_inicio = datetime.strptime(f"{fecha} {hora_inicio}", "%Y-%m-%d %H:%M")
+        fecha_fin = datetime.strptime(f"{fecha} {hora_fin}", "%Y-%m-%d %H:%M")
+        print(f"Fecha inicio: {fecha_inicio}, Fecha fin: {fecha_fin}")  # Verificar las fechas convertidas
+    except ValueError as e:
+        print(f"Error de formato de fecha: {str(e)}")  # Agregar mensaje de error
+        return jsonify({'status': 'error', 'message': f"Formato de fecha inválido: {str(e)}"}), 400
 
+    # Asegurarse de que el usuario esté autenticado y tenga un azure_user_id válido
+    azure_user_id = g.user.get('azure_user_id')
+    if not azure_user_id:
+        return jsonify({'status': 'error', 'message': 'Usuario no autenticado correctamente'}), 400
+
+    # Intentar guardar el evento en la base de datos
     try:
         cursor = get_db().cursor()
         cursor.execute("""
@@ -128,56 +152,31 @@ def crear_evento():
             VALUES (%s, %s, %s, %s, %s)
         """, (titulo, descripcion, fecha_inicio, fecha_fin, azure_user_id))
         get_db().commit()
+
+        # Obtener el ID del evento recién insertado
         new_event_id = cursor.lastrowid
         return jsonify({'status': 'success', 'id': new_event_id})
     except Exception as e:
+        # Mostrar error detallado para depuración
+        print(f"Error al guardar el evento: {str(e)}")  # Agregar el mensaje de error aquí
         get_db().rollback()
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-# Ruta para agregar participantes a un evento
-@app.route('/agregar-participante/<int:evento_id>', methods=['POST'])
-def agregar_participante(evento_id):
-    if not session.get('user'):
-        return redirect(url_for('login'))
-    azure_user_id = g.user['azure_user_id']
-
-    try:
-        cursor = get_db().cursor()
-        cursor.execute("""
-            INSERT INTO participantes (id_evento, azure_user_id)
-            VALUES (%s, %s)
-        """, (evento_id, azure_user_id))
-        get_db().commit()
-        flash('Participante agregado exitosamente', 'success')
-    except Exception as e:
-        get_db().rollback()
-        flash(f'Error al agregar el participante: {str(e)}', 'danger')
-
-    return redirect(url_for('ver_evento', evento_id=evento_id))
-
+        return jsonify({'status': 'error', 'message': f"Error al guardar el evento: {str(e)}"}), 500
+    
 # Ruta para ver detalles del evento y los participantes
 @app.route('/ver-evento/<int:evento_id>')
 def ver_evento(evento_id):
     if not session.get('user'):
         return redirect(url_for('login'))
     try:
-        cursor = get_db().cursor()
+        cursor = get_db().cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * FROM eventos WHERE id = %s", (evento_id,))
         evento = cursor.fetchone()
 
-        cursor.execute("""
-            SELECT usuarios.nombre
-            FROM participantes
-            JOIN usuarios ON participantes.azure_user_id = usuarios.azure_user_id
-            WHERE participantes.id_evento = %s
-        """, (evento_id,))
-        participantes = cursor.fetchall()
-
-        return render_template('ver_evento.html', evento=evento, participantes=participantes)
+        return render_template('ver_evento.html', evento=evento)
     except Exception as e:
         flash(f'Error al obtener el evento: {str(e)}', 'danger')
         return redirect(url_for('home'))
-
+    
 # Ruta principal
 @app.route('/')
 def home():
@@ -186,47 +185,21 @@ def home():
 # Ruta para iniciar sesión
 @app.route('/login')
 def login():
-    try:
-        # Generar nonce y state, y almacenarlos en la sesión
-        nonce = secrets.token_urlsafe(16)
-        state = secrets.token_urlsafe(16)
-        session['nonce'] = nonce
-        session['state'] = state
-
-        # Definir el URI de redirección
-        redirect_uri = url_for('auth', _external=True, _scheme='https')
-
-        # Imprimir para depuración
-        print(f"Redirect URI: {redirect_uri}, Nonce: {nonce}, State: {state}")
-
-        # Redirigir al proveedor OAuth
-        return azure.authorize_redirect(redirect_uri, nonce=nonce, state=state)
-    except Exception as e:
-        return f"Error during login: {str(e)}", 500
+    nonce = secrets.token_urlsafe(16)
+    session['nonce'] = nonce
+    redirect_uri = url_for('auth', _external=True, _scheme='https')
+    return azure.authorize_redirect(redirect_uri, nonce=nonce)
 
 # Ruta de callback
 @app.route('/auth')
 def auth():
     try:
-        # Obtener el token de acceso
         token = azure.authorize_access_token()
-
-        # Obtener nonce y state desde la sesión
-        nonce = session.get('nonce')
-        state = session.get('state')
-
-        # Verificar que el estado recibido coincida con el almacenado en la sesión
-        if state != request.args.get('state'):
-            raise ValueError("State no coincide entre la solicitud y la respuesta")
-
-        if not nonce:
-            return "Error: Nonce no encontrado en la sesión", 500
-
-        # Procesar el token y obtener la información del usuario
+        nonce = session.pop('nonce', None)
         user = azure.parse_id_token(token, nonce=nonce)
+
         if user:
-            # Asegurarse de que azure_user_id esté disponible
-            azure_user_id = user.get('oid') or user.get('sub')  # 'oid' o 'sub' según Azure AD
+            azure_user_id = user.get('oid') or user.get('sub')
             cursor = get_db().cursor()
             cursor.execute("""
                 INSERT INTO usuarios (azure_user_id, nombre, email)
@@ -235,9 +208,12 @@ def auth():
             """, (azure_user_id, user.get('name', 'Unknown'), user.get('email', 'No email')))
             get_db().commit()
             cursor.close()
-            session['user'] = {'azure_user_id': azure_user_id, 'name': user.get('name', 'Unknown'), 'email': user.get('email', 'No email')}
-            session.pop('nonce', None)
-            session.pop('state', None)
+
+            session['user'] = {
+                'azure_user_id': azure_user_id,
+                'name': user.get('name', 'Unknown'),
+                'email': user.get('email', 'No email')
+            }
 
         return redirect(url_for('profile'))
     except Exception as e:

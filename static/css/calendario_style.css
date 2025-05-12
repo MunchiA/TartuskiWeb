@@ -30,6 +30,7 @@
     font-size: 1.25rem;
     font-weight: bold;
     margin-bottom: 1rem;
+    color: #333;
 }
 
 /* Estilo de los campos del formulario en el modal */
@@ -41,6 +42,7 @@ input[type="time"] {
     padding: 0.75rem;
     width: 100%;
     margin-bottom: 1rem;
+    font-size: 1rem;
 }
 
 /* Botones del modal */
@@ -49,6 +51,7 @@ button {
     border-radius: 0.5rem;
     font-size: 1rem;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 button:hover {
@@ -57,16 +60,35 @@ button:hover {
 
 button:focus {
     outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
+/* Estilo para los botones de acción */
 button[type="submit"] {
     background-color: #007bff;
     color: white;
 }
 
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
 button[type="button"] {
     background-color: #6c757d;
     color: white;
+}
+
+button[type="button"]:hover {
+    background-color: #5a6268;
+}
+
+/* Botón de eliminar */
+button#deleteEventButton {
+    background-color: #dc3545;
+}
+
+button#deleteEventButton:hover {
+    background-color: #c82333;
 }
 
 /* Contenedor general con el calendario a la izquierda y lista a la derecha */
@@ -96,6 +118,7 @@ button[type="button"] {
     padding: 1rem;
     max-height: 600px;
     font-family: 'Arial', sans-serif;
+    overflow-y: auto;
 }
 
 /* Título de eventos */
@@ -119,6 +142,11 @@ button[type="button"] {
     background-color: #f9f9f9;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+#eventList li:hover {
+    background-color: #f1f1f1;
 }
 
 #eventList li strong {
@@ -139,8 +167,41 @@ button[type="button"] {
     color: white;
     font-size: 0.85rem;
     padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .fc-event:hover {
     background-color: #0056b3;
+}
+
+/* Estilo para los eventos de FullCalendar cuando son seleccionados */
+.fc-event.fc-selected {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+/* Estilo para el título del calendario */
+.fc-header-toolbar {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Botones de navegación de FullCalendar */
+.fc-prev-button, .fc-next-button {
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+}
+
+.fc-prev-button:hover, .fc-next-button:hover {
+    background-color: #0056b3;
+}
+
+/* Títulos del calendario */
+.fc-header-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
 }
