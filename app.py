@@ -1,27 +1,35 @@
-from flask import Flask, redirect, url_for, render_template, session, request, jsonify, g, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, g
+from flask_sqlalchemy import SQLAlchemy  # Replace MySQLdb with Flask-SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from authlib.integrations.flask_client import OAuth
-from utils.email_utils import enviar_correo_contacto
-from dotenv import load_dotenv
+import requests
+import json
+from datetime import datetime, timedelta
 import os
-import secrets
-import MySQLdb
-from datetime import datetime
+from dotenv import load_dotenv
 from email.mime.text import MIMEText
 import smtplib
-from datetime import datetime
+from utils.email_utils import enviar_correo_contacto
+import secrets  # For nonce generation
 
+# Cargar variables de entorno desde .env
 load_dotenv()
 
 app = Flask(__name__)
 
 # Usar la clave secreta desde el archivo .env
 app.secret_key = os.getenv('FLASK_SECRET_KEY')
-
 if not app.secret_key:
     raise ValueError("SECRET_KEY is not set in .env file")
 
-# Cargar variables de entorno
-load_dotenv()
+# Configurar Flask-SQLAlchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    f"mysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASS')}@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
+)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)  # Initialize Flask-SQLAlchemy
+
+# Cargar variables de entorno para Azure AD
 client_id = os.getenv('AZURE_AD_CLIENT_ID')
 tenant_id = os.getenv('AZURE_AD_TENANT_ID')
 client_secret = os.getenv('AZURE_AD_CLIENT_SECRET')
@@ -43,144 +51,89 @@ azure = oauth.register(
     client_kwargs={'scope': 'openid profile email User.Read'},
 )
 
-# Configuración de la base de datos MySQL desde .env
-db = MySQLdb.connect(
-    host=os.getenv('DB_HOST'),
-    user=os.getenv('DB_USER'),
-    passwd=os.getenv('DB_PASS'),
-    db=os.getenv('DB_NAME')
-)
+# Configurar Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
-# Función para obtener la conexión a la base de datos
-def get_db():
-    if not hasattr(g, 'db'):
-        g.db = db
-    return g.db
+# Modelos de la base de datos
+class Usuario(db.Model, UserMixin):
+    __tablename__ = 'usuarios'
+    azure_user_id = db.Column(db.String(255), primary_key=True)
+    nombre = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), nullable=False)
+    eventos = db.relationship('Evento', backref='usuario', lazy=True)
 
-# Cerrar la conexión a la base de datos después de cada solicitud
-@app.teardown_appcontext
-def close_db(error):
-    db = getattr(g, 'db', None)
-    if db is not None:
-        db.close()
+    # Necesario para Flask-Login
+    def get_id(self):
+        return self.azure_user_id
 
-# Ruta para el calendario
-@app.route('/calendario')
-def calendario():
-    if not session.get('user'):
-        return redirect(url_for('login'))
-    return render_template('calendario.html')
+    @property
+    def id(self):
+        return self.azure_user_id
 
-# Ruta para obtener eventos
-@app.route('/obtener-eventos', methods=['GET'])
-def obtener_eventos():
-    if not session.get('user'):
-        return jsonify({'status': 'error', 'message': 'No autenticado'}), 401
-    
-    try:
-        cursor = get_db().cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("""
-            SELECT e.id, e.titulo, e.descripcion, e.fecha_inicio, e.fecha_fin, u.nombre as creator
-            FROM eventos e
-            JOIN usuarios u ON e.azure_user_id = u.azure_user_id
-        """)
-        events = cursor.fetchall()
-        cursor.close()
+    @property
+    def name(self):
+        return self.nombre
 
-        formatted_events = []
-        for event in events:
-            start = event['fecha_inicio'].strftime("%Y-%m-%dT%H:%M:%S") if event['fecha_inicio'] else None
-            end = event['fecha_fin'].strftime("%Y-%m-%dT%H:%M:%S") if event['fecha_fin'] else None
-            formatted_events.append({
-                'id': event['id'],
-                'title': event['titulo'],
-                'start': start,
-                'end': end,
-                'description': event['descripcion'],
-                'creator': event['creator']
-            })
+    def __repr__(self):
+        return f'<Usuario {self.email}>'
 
-        return jsonify(formatted_events)
-    
-    except Exception as e:
-        print(f"Error al obtener eventos: {str(e)}")  # Para ver el error en el log
-        return jsonify({'status': 'error', 'message': 'Error al obtener los eventos'}), 500
+class Evento(db.Model):
+    __tablename__ = 'eventos'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    titulo = db.Column(db.String(255), nullable=False)
+    descripcion = db.Column(db.Text, nullable=True)
+    fecha_inicio = db.Column(db.DateTime, nullable=False)
+    fecha_fin = db.Column(db.DateTime, nullable=False)
+    azure_user_id = db.Column(db.String(255), db.ForeignKey('usuarios.azure_user_id'), nullable=False)
 
-# Ruta para crear eventos
-@app.route('/crear-evento', methods=['POST'])
-def crear_evento():
-    if not session.get('user'):
-        return jsonify({'status': 'error', 'message': 'No autenticado'}), 401
-    if not request.is_json:
-        return jsonify({'status': 'error', 'message': 'Solicitud no es JSON'}), 400
+    def __repr__(self):
+        return f'<Evento {self.titulo}>'
 
-    # Obtener datos JSON
-    data = request.get_json()
-    titulo = data.get('titulo', '').strip()
-    descripcion = data.get('descripcion', '').strip()
-    fecha = data.get('fecha', '')
-    hora_inicio = data.get('hora_inicio', '00:00')
-    hora_fin = data.get('hora_fin', '00:00')
+# Flask-Login user loader
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.query.get(user_id)
 
-    # Imprimir los valores recibidos para depuración
-    print(f"Datos recibidos - Título: {titulo}, Descripción: {descripcion}, Fecha: {fecha}, Hora inicio: {hora_inicio}, Hora fin: {hora_fin}")
-
-    # Validar que el título y la fecha sean proporcionados
-    if not titulo or not fecha:
-        return jsonify({'status': 'error', 'message': 'Título y fecha son obligatorios'}), 400
-
-    # Crear fechas en formato adecuado
-    try:
-        # Convertir las fechas a formato datetime
-        fecha_inicio = datetime.strptime(f"{fecha} {hora_inicio}", "%Y-%m-%d %H:%M")
-        fecha_fin = datetime.strptime(f"{fecha} {hora_fin}", "%Y-%m-%d %H:%M")
-        print(f"Fecha inicio: {fecha_inicio}, Fecha fin: {fecha_fin}")  # Verificar las fechas convertidas
-    except ValueError as e:
-        print(f"Error de formato de fecha: {str(e)}")  # Agregar mensaje de error
-        return jsonify({'status': 'error', 'message': f"Formato de fecha inválido: {str(e)}"}), 400
-
-    # Asegurarse de que el usuario esté autenticado y tenga un azure_user_id válido
-    azure_user_id = g.user.get('azure_user_id')
-    if not azure_user_id:
-        return jsonify({'status': 'error', 'message': 'Usuario no autenticado correctamente'}), 400
-
-    # Intentar guardar el evento en la base de datos
-    try:
-        cursor = get_db().cursor()
-        cursor.execute("""
-            INSERT INTO eventos (titulo, descripcion, fecha_inicio, fecha_fin, azure_user_id)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (titulo, descripcion, fecha_inicio, fecha_fin, azure_user_id))
-        get_db().commit()
-
-        # Obtener el ID del evento recién insertado
-        new_event_id = cursor.lastrowid
-        return jsonify({'status': 'success', 'id': new_event_id})
-    except Exception as e:
-        # Mostrar error detallado para depuración
-        print(f"Error al guardar el evento: {str(e)}")  # Agregar el mensaje de error aquí
-        get_db().rollback()
-        return jsonify({'status': 'error', 'message': f"Error al guardar el evento: {str(e)}"}), 500
-    
-# Ruta para ver detalles del evento y los participantes
-@app.route('/ver-evento/<int:evento_id>')
-def ver_evento(evento_id):
-    if not session.get('user'):
-        return redirect(url_for('login'))
-    try:
-        cursor = get_db().cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("SELECT * FROM eventos WHERE id = %s", (evento_id,))
-        evento = cursor.fetchone()
-
-        return render_template('ver_evento.html', evento=evento)
-    except Exception as e:
-        flash(f'Error al obtener el evento: {str(e)}', 'danger')
-        return redirect(url_for('home'))
-    
-# Ruta principal
+# Rutas para las páginas visibles
 @app.route('/')
 def home():
     return render_template('home.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/services')
+def services():
+    return render_template('services.html')
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        nombre = request.form.get('name')
+        email = request.form.get('email')
+        telefono = request.form.get('phone')
+        asunto = request.form.get('subject')
+        mensaje = request.form.get('message')
+
+        # Verificamos si el formulario contiene los datos requeridos
+        if not nombre or not email or not mensaje:
+            flash("Por favor, completa todos los campos obligatorios.", "error")
+            return redirect(url_for('contact'))
+
+        try:
+            # Llamamos a la función para enviar el correo
+            enviar_correo_contacto(nombre, email, telefono, asunto, mensaje)
+            flash("¡Mensaje enviado correctamente! Nos pondremos en contacto contigo pronto.", "success")
+            return redirect(url_for('contact'))
+        except Exception as e:
+            flash(f"Error al enviar el mensaje: {e}", "error")
+            return redirect(url_for('contact'))
+
+    return render_template('contact.html')  
 
 # Ruta para iniciar sesión
 @app.route('/login')
@@ -200,22 +153,28 @@ def auth():
 
         if user:
             azure_user_id = user.get('oid') or user.get('sub')
-            cursor = get_db().cursor()
-            cursor.execute("""
-                INSERT INTO usuarios (azure_user_id, nombre, email)
-                VALUES (%s, %s, %s)
-                ON DUPLICATE KEY UPDATE nombre=VALUES(nombre), email=VALUES(email)
-            """, (azure_user_id, user.get('name', 'Unknown'), user.get('email', 'No email')))
-            get_db().commit()
-            cursor.close()
+            # Use Flask-SQLAlchemy to handle user insertion
+            usuario = Usuario.query.get(azure_user_id)
+            if not usuario:
+                usuario = Usuario(
+                    azure_user_id=azure_user_id,
+                    nombre=user.get('name', 'Unknown'),
+                    email=user.get('email', 'No email')
+                )
+                db.session.add(usuario)
+            else:
+                usuario.nombre = user.get('name', 'Unknown')
+                usuario.email = user.get('email', 'No email')
+            db.session.commit()
 
+            login_user(usuario)  # Log in the user with Flask-Login
             session['user'] = {
                 'azure_user_id': azure_user_id,
                 'name': user.get('name', 'Unknown'),
                 'email': user.get('email', 'No email')
             }
 
-        return redirect(url_for('profile'))
+        return redirect(url_for('home'))
     except Exception as e:
         return f"Error during auth: {str(e)}", 500
 
@@ -225,59 +184,81 @@ def load_user():
     user = session.get('user')
     g.user = user
 
-# Ruta para el perfil
-@app.route('/profile')
-def profile():
-    user = session.get('user')
-    if not user:
-        return redirect(url_for('login'))
-    return render_template('profile.html', user=user)
-
 # Ruta para cerrar sesión
 @app.route('/logout')
+@login_required
 def logout():
     session.pop('user', None)
+    logout_user()  # Log out the user with Flask-Login
     flash('Sesión cerrada', 'success')
     return redirect(url_for('home'))
 
-@app.route('/sobre-nosotros')
-def sobre_nosotros():
-    return render_template('sobre_nosotros.html')
+@app.route('/calendar')
+@login_required
+def calendar():
+    eventos = Evento.query.filter_by(azure_user_id=current_user.azure_user_id).all()
+    return render_template('calendar.html', events=eventos)
 
-@app.route('/servicios')
-def servicios():
-    return render_template('servicios.html')
+@app.route('/api/events', methods=['GET'])
+@login_required
+def get_events():
+    eventos = Evento.query.filter_by(azure_user_id=current_user.azure_user_id).all()
+    events_data = [
+        {
+            'id': evento.id,
+            'title': evento.titulo,
+            'start': evento.fecha_inicio.strftime('%Y-%m-%dT%H:%M:%S'),
+            'end': evento.fecha_fin.strftime('%Y-%m-%dT%H:%M:%S'),
+            'description': evento.descripcion or ''
+        }
+        for evento in eventos
+    ]
+    return jsonify(events_data)
 
-@app.route('/contactanos', methods=['GET', 'POST'])
-def contactanos():
-    if request.method == 'POST':
-        # Obtener los datos del formulario
-        nombre = request.form.get('name')
-        email = request.form.get('email')
-        telefono = request.form.get('phone')
-        asunto = request.form.get('subject')
-        servicio = request.form.get('service')
-        mensaje = request.form.get('message')
+@app.route('/add_event', methods=['POST'])
+@login_required
+def add_event():
+    try:
+        titulo = request.form['title']
+        descripcion = request.form['description']
+        fecha_inicio = datetime.strptime(request.form['start_time'], '%Y-%m-%dT%H:%M')
+        fecha_fin = datetime.strptime(request.form['end_time'], '%Y-%m-%dT%H:%M')
 
-        # Verificamos si el formulario contiene los datos requeridos
-        if not nombre or not email or not mensaje:
-            flash("Por favor, completa todos los campos obligatorios.", "error")
-            return redirect(url_for('contactanos'))
+        nuevo_evento = Evento(
+            titulo=titulo,
+            descripcion=descripcion,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+            azure_user_id=current_user.azure_user_id
+        )
 
-        try:
-            # Llamamos a la función para enviar el correo
-            enviar_correo_contacto(nombre, email, telefono, asunto, servicio, mensaje)
-            flash("¡Mensaje enviado correctamente! Nos pondremos en contacto contigo pronto.", "success")
-            return redirect(url_for('contactanos'))
-        except Exception as e:
-            flash(f"Error al enviar el mensaje: {e}", "error")
-            return redirect(url_for('contactanos'))
+        db.session.add(nuevo_evento)
+        db.session.commit()
+        flash('Evento agregado correctamente', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Hubo un error al agregar el evento: {str(e)}', 'danger')
 
-    return render_template('contactanos.html')  
+    return redirect(url_for('calendar'))
 
-required_env_vars = ['FLASK_SECRET_KEY', 'AZURE_AD_CLIENT_ID', 'AZURE_AD_TENANT_ID', 'AZURE_AD_CLIENT_SECRET', 'DB_HOST', 'DB_USER', 'DB_PASS', 'DB_NAME', 'EMAIL_ADDRESS', 'EMAIL_PASSWORD']
-if not all(os.getenv(var) for var in required_env_vars):
-    raise ValueError("Faltan una o más variables de entorno requeridas.")
+@app.route('/delete_event/<int:event_id>', methods=['DELETE'])
+def delete_event(event_id):
+    try:
+        # Intentamos obtener el evento de la base de datos
+        evento = Evento.query.get_or_404(event_id)
+        
+        # Eliminamos el evento de la base de datos
+        db.session.delete(evento)
+        db.session.commit()
+        
+        # Respuesta exitosa
+        return jsonify({"message": "Evento eliminado con éxito"}), 200
+    except Exception as e:
+        # Si ocurre un error, revertimos la transacción y enviamos un mensaje de error
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()  # Create tables if they don't exist
     app.run(debug=True)
