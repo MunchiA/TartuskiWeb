@@ -1,0 +1,147 @@
+{% extends 'layout.html' %}
+
+{% block title %}Calendario - Tartuski{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css">
+<style>
+    .fc-event {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Calendario</h1>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
+        <i class="bi bi-plus-circle me-2"></i> Nuevo Evento
+    </button>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para añadir evento -->
+<div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEventModalLabel">Añadir Nuevo Evento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addEventForm" method="POST" action="{{ url_for('add_event') }}">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Título *</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="start_time" class="form-label">Fecha y hora de inicio *</label>
+                        <input type="datetime-local" class="form-control" id="start_time" name="start_time" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="end_time" class="form-label">Fecha y hora de fin *</label>
+                        <input type="datetime-local" class="form-control" id="end_time" name="end_time" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="addEventForm" class="btn btn-primary">Guardar Evento</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver detalles del evento -->
+<div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventDetailsModalLabel">Detalles del Evento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h4 id="eventTitle"></h4>
+                <p><strong>Descripción:</strong> <span id="eventDescription"></span></p>
+                <p><strong>Inicio:</strong> <span id="eventStart"></span></p>
+                <p><strong>Fin:</strong> <span id="eventEnd"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-danger" id="deleteEventBtn">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales-all.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var selectedEventId = null; // Guardará el ID del evento seleccionado
+    
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            locale: 'es',
+            events: '/api/events',
+            eventClick: function(info) {
+                selectedEventId = info.event.id; // Guarda el ID del evento
+    
+                document.getElementById('eventTitle').textContent = info.event.title;
+                document.getElementById('eventDescription').textContent = info.event.extendedProps.description || 'Sin descripción';
+    
+                var startDate = new Date(info.event.start);
+                var endDate = info.event.end ? new Date(info.event.end) : null;
+    
+                document.getElementById('eventStart').textContent = startDate.toLocaleString('es-ES');
+                document.getElementById('eventEnd').textContent = endDate ? endDate.toLocaleString('es-ES') : 'No especificado';
+    
+                var eventDetailsModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+                eventDetailsModal.show();
+            }
+        });
+    
+        calendar.render();
+    
+        // Acción del botón "Eliminar"
+        document.getElementById('deleteEventBtn').addEventListener('click', function() {
+            if (selectedEventId && confirm("¿Estás seguro de que quieres eliminar este evento?")) {
+                fetch(`/delete_event/${selectedEventId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Ocultar modal y refrescar eventos
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('eventDetailsModal'));
+                        modal.hide();
+                        calendar.refetchEvents(); // Recargar eventos sin recargar la página
+                    } else {
+                        alert('Error al eliminar el evento.');
+                    }
+                });
+            }
+        });
+    });
+    </script>
+{% endblock %}

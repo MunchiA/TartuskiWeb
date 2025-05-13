@@ -1,0 +1,353 @@
+{% extends 'layout.html' %}
+
+{% block title %}Servicios - Tartuski{% endblock %}
+
+{% block content %}
+<div class="services-header text-center mb-5">
+    <h1 class="display-4">Nuestros Servicios</h1>
+    <p class="lead">Soluciones tecnológicas integrales para tu empresa</p>
+</div>
+
+<div class="row mb-5">
+    <div class="col-lg-4">
+        <div class="servicios nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+            <button class="nav-link active" id="v-pills-sistemas-tab" data-bs-toggle="pill" data-bs-target="#v-pills-sistemas" type="button" role="tab" aria-controls="v-pills-sistemas" aria-selected="true">
+                <i class="bi bi-hdd-network me-2"></i> Sistemas y Redes
+            </button>
+            <button class="nav-link" id="v-pills-helpdesk-tab" data-bs-toggle="pill" data-bs-target="#v-pills-helpdesk" type="button" role="tab" aria-controls="v-pills-helpdesk" aria-selected="false">
+                <i class="bi bi-headset me-2"></i> Helpdesk
+            </button>
+            <button class="nav-link" id="v-pills-voip-tab" data-bs-toggle="pill" data-bs-target="#v-pills-voip" type="button" role="tab" aria-controls="v-pills-voip" aria-selected="false">
+                <i class="bi bi-telephone me-2"></i> Telefonía VoIP
+            </button>
+            <button class="nav-link" id="v-pills-cloud-tab" data-bs-toggle="pill" data-bs-target="#v-pills-cloud" type="button" role="tab" aria-controls="v-pills-cloud" aria-selected="false">
+                <i class="bi bi-cloud me-2"></i> Soluciones Cloud
+            </button>
+            <button class="nav-link" id="v-pills-seguridad-tab" data-bs-toggle="pill" data-bs-target="#v-pills-seguridad" type="button" role="tab" aria-controls="v-pills-seguridad" aria-selected="false">
+                <i class="bi bi-shield-lock me-2"></i> Seguridad Informática
+            </button>
+            <button class="nav-link" id="v-pills-consultoria-tab" data-bs-toggle="pill" data-bs-target="#v-pills-consultoria" type="button" role="tab" aria-controls="v-pills-consultoria" aria-selected="false">
+                <i class="bi bi-graph-up me-2"></i> Consultoría IT
+            </button>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="tab-content" id="v-pills-tabContent">
+            <div class="tab-pane fade show active" id="v-pills-sistemas" role="tabpanel" aria-labelledby="v-pills-sistemas-tab">
+                <div class="service-detail">
+                    <h2 id="sistemas">Sistemas y Redes</h2>
+                    <img src="{{ url_for('static', filename='img/service-sistemas.jpg') }}" alt="Sistemas y Redes" class="img-fluid rounded mb-4">
+                    <p>Diseñamos, implementamos y mantenemos infraestructuras de red y sistemas informáticos adaptados a las necesidades específicas de tu empresa. Nuestro equipo de expertos se encarga de optimizar el rendimiento y la seguridad de tus sistemas para garantizar su funcionamiento óptimo.</p>
+                    
+                    <h4 class="mt-4">Servicios incluidos:</h4>
+                    <ul class="service-list">
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Diseño e implementación de redes LAN/WAN</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Configuración y administración de servidores Windows y Linux</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Virtualización de servidores (VMware, Hyper-V)</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Implementación de soluciones de almacenamiento (NAS, SAN)</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Configuración de firewalls y VPNs</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Monitorización y mantenimiento proactivo</li>
+                    </ul>
+                    
+                    <div class="service-cta mt-4">
+                        <a href="{{ url_for('contact') }}" class="btn btn-primary">Solicitar información</a>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-helpdesk" role="tabpanel" aria-labelledby="v-pills-helpdesk-tab">
+                <div class="service-detail">
+                    <h2 id="helpdesk">Helpdesk</h2>
+                    <img src="{{ url_for('static', filename='img/service-helpdesk.jpg') }}" alt="Helpdesk" class="img-fluid rounded mb-4">
+                    <p>Nuestro servicio de helpdesk proporciona soporte técnico remoto y presencial para resolver incidencias y mantener tus equipos funcionando correctamente. Contamos con un equipo de técnicos especializados disponibles para atender tus necesidades de forma rápida y eficiente.</p>
+                    
+                    <h4 class="mt-4">Servicios incluidos:</h4>
+                    <ul class="service-list">
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soporte técnico remoto y presencial</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Resolución de incidencias</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Mantenimiento preventivo y correctivo</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Gestión de parque informático</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Instalación y configuración de software</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soporte a usuarios finales</li>
+                    </ul>
+                    
+                    <div class="service-cta mt-4">
+                        <a href="{{ url_for('contact') }}" class="btn btn-primary">Solicitar información</a>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-voip" role="tabpanel" aria-labelledby="v-pills-voip-tab">
+                <div class="service-detail">
+                    <h2 id="voip">Telefonía VoIP</h2>
+                    <img src="{{ url_for('static', filename='img/service-voip.jpg') }}" alt="Telefonía VoIP" class="img-fluid rounded mb-4">
+                    <p>Implementamos soluciones de telefonía IP que permiten a tu empresa reducir costes y mejorar la comunicación interna y con clientes. Nuestras soluciones VoIP se integran perfectamente con tus sistemas existentes y ofrecen funcionalidades avanzadas para optimizar tus comunicaciones.</p>
+                    
+                    <h4 class="mt-4">Servicios incluidos:</h4>
+                    <ul class="service-list">
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Implementación de centralitas IP</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Configuración de teléfonos IP</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Integración con sistemas CRM</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Configuración de IVR y call centers</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soluciones de videoconferencia</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Mantenimiento y soporte de sistemas VoIP</li>
+                    </ul>
+                    
+                    <div class="service-cta mt-4">
+                        <a href="{{ url_for('contact') }}" class="btn btn-primary">Solicitar información</a>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-cloud" role="tabpanel" aria-labelledby="v-pills-cloud-tab">
+                <div class="service-detail">
+                    <h2 id="cloud">Soluciones Cloud</h2>
+                    <img src="{{ url_for('static', filename='img/service-cloud.jpg') }}" alt="Soluciones Cloud" class="img-fluid rounded mb-4">
+                    <p>Ofrecemos servicios de migración a la nube, implementación de servicios cloud y optimización de recursos en entornos Azure y AWS. Nuestras soluciones cloud permiten a tu empresa aumentar la flexibilidad, escalabilidad y seguridad de tus sistemas, reduciendo costes de infraestructura.</p>
+                    
+                    <h4 class="mt-4">Servicios incluidos:</h4>
+                    <ul class="service-list">
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Migración a la nube (Azure, AWS, Google Cloud)</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Implementación de Office 365 y Microsoft 365</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soluciones de backup en la nube</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Despliegue de servidores virtuales</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Gestión de identidades en la nube</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Optimización de costes en entornos cloud</li>
+                    </ul>
+                    
+                    <div class="service-cta mt-4">
+                        <a href="{{ url_for('contact') }}" class="btn btn-primary">Solicitar información</a>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-seguridad" role="tabpanel" aria-labelledby="v-pills-seguridad-tab">
+                <div class="service-detail">
+                    <h2 id="seguridad">Seguridad Informática</h2>
+                    <img src="{{ url_for('static', filename='img/service-seguridad.jpg') }}" alt="Seguridad Informática" class="img-fluid rounded mb-4">
+                    <p>Protegemos tu empresa contra amenazas cibernéticas mediante la implementación de soluciones de seguridad avanzadas. Nuestro enfoque integral de la seguridad informática garantiza la protección de tus datos y sistemas contra ataques externos e internos.</p>
+                    
+                    <h4 class="mt-4">Servicios incluidos:</h4>
+                    <ul class="service-list">
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Auditorías de seguridad</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Implementación de firewalls y sistemas de detección de intrusiones</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soluciones antivirus y anti-malware</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Gestión de vulnerabilidades</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Formación en seguridad para empleados</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Planes de recuperación ante desastres</li>
+                    </ul>
+                    
+                    <div class="service-cta mt-4">
+                        <a href="{{ url_for('contact') }}" class="btn btn-primary">Solicitar información</a>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="v-pills-consultoria" role="tabpanel" aria-labelledby="v-pills-consultoria-tab">
+                <div class="service-detail">
+                    <h2 id="consultoria">Consultoría IT</h2>
+                    <img src="{{ url_for('static', filename='img/service-consultoria.jpg') }}" alt="Consultoría IT" class="img-fluid rounded mb-4">
+                    <p>Asesoramos a tu empresa en la toma de decisiones tecnológicas para optimizar tus recursos y mejorar la eficiencia de tus procesos. Nuestro equipo de consultores analiza tus necesidades y te proporciona soluciones adaptadas a tu negocio.</p>
+                    
+                    <h4 class="mt-4">Servicios incluidos:</h4>
+                    <ul class="service-list">
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Análisis de infraestructuras</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Planificación estratégica de IT</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Optimización de procesos</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Gestión de proyectos tecnológicos</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Asesoramiento en transformación digital</li>
+                        <li><i class="bi bi-check-circle-fill text-success me-2"></i> Análisis de costes y ROI</li>
+                    </ul>
+                    
+                    <div class="service-cta mt-4">
+                        <a href="{{ url_for('contact') }}" class="btn btn-primary">Solicitar información</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12 text-center mb-4">
+        <h2>Nuestros Planes</h2>
+        <p class="section-subtitle">Soluciones adaptadas a tus necesidades</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card pricing-card h-100">
+            <div class="card-header text-center">
+                <h3>Plan Básico</h3>
+                <div class="price">
+                    <span class="currency">€</span>
+                    <span class="amount">299</span>
+                    <span class="period">/mes</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="pricing-features">
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soporte helpdesk (8x5)</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Monitorización básica</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Mantenimiento preventivo</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Backup en la nube (100GB)</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Antivirus gestionado</li>
+                    <li class="text-muted"><i class="bi bi-x-circle-fill text-danger me-2"></i> Soporte presencial</li>
+                    <li class="text-muted"><i class="bi bi-x-circle-fill text-danger me-2"></i> Auditorías de seguridad</li>
+                    <li class="text-muted"><i class="bi bi-x-circle-fill text-danger me-2"></i> Consultoría IT</li>
+                </ul>
+            </div>
+            <div class="card-footer text-center">
+                <a href="{{ url_for('contact') }}" class="btn btn-outline-primary">Contratar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card pricing-card h-100 popular">
+            <div class="card-header text-center">
+                <span class="popular-badge">Más Popular</span>
+                <h3>Plan Profesional</h3>
+                <div class="price">
+                    <span class="currency">€</span>
+                    <span class="amount">599</span>
+                    <span class="period">/mes</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="pricing-features">
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soporte helpdesk (12x5)</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Monitorización avanzada</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Mantenimiento preventivo y correctivo</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Backup en la nube (500GB)</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Antivirus gestionado</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soporte presencial (8h/mes)</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Auditorías de seguridad trimestrales</li>
+                    <li class="text-muted"><i class="bi bi-x-circle-fill text-danger me-2"></i> Consultoría IT</li>
+                </ul>
+            </div>
+            <div class="card-footer text-center">
+                <a href="{{ url_for('contact') }}" class="btn btn-primary">Contratar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card pricing-card h-100">
+            <div class="card-header text-center">
+                <h3>Plan Enterprise</h3>
+                <div class="price">
+                    <span class="currency">€</span>
+                    <span class="amount">999</span>
+                    <span class="period">/mes</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="pricing-features">
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soporte helpdesk (24x7)</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Monitorización premium</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Mantenimiento integral</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Backup en la nube (1TB)</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Solución de seguridad completa</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Soporte presencial ilimitado</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Auditorías de seguridad mensuales</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-2"></i> Consultoría IT (4h/mes)</li>
+                </ul>
+            </div>
+            <div class="card-footer text-center">
+                <a href="{{ url_for('contact') }}" class="btn btn-outline-primary">Contratar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="faq-section mt-5">
+    <div class="row">
+        <div class="col-12 text-center mb-4">
+            <h2>Preguntas Frecuentes</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="accordion" id="accordionFaq1">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            ¿Cuál es el tiempo de respuesta ante incidencias?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionFaq1">
+                        <div class="accordion-body">
+                            Nuestro tiempo de respuesta varía según el plan contratado y la criticidad de la incidencia. Para incidencias críticas, garantizamos una respuesta en menos de 1 hora en todos nuestros planes. Para incidencias no críticas, el tiempo de respuesta puede variar entre 2 y 8 horas dependiendo del plan.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            ¿Ofrecen servicios para pequeñas empresas?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionFaq1">
+                        <div class="accordion-body">
+                            Sí, ofrecemos soluciones adaptadas a empresas de todos los tamaños. Nuestro Plan Básico está especialmente diseñado para pequeñas empresas que necesitan servicios de IT profesionales a un precio asequible. También ofrecemos planes personalizados según las necesidades específicas de cada cliente.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            ¿Cómo funciona el soporte remoto?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionFaq1">
+                        <div class="accordion-body">
+                            Nuestro soporte remoto se realiza a través de herramientas seguras que nos permiten conectarnos a tus equipos para resolver incidencias sin necesidad de desplazamiento. Utilizamos software de conexión remota cifrada que garantiza la seguridad de tus datos. El usuario debe autorizar cada conexión para garantizar la privacidad.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="accordion" id="accordionFaq2">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            ¿Qué incluye el servicio de migración a la nube?
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionFaq2">
+                        <div class="accordion-body">
+                            Nuestro servicio de migración a la nube incluye análisis de la infraestructura actual, planificación de la migración, implementación de la solución cloud seleccionada (Azure, AWS o Google Cloud), migración de datos y aplicaciones, configuración de seguridad, formación a usuarios y soporte post-migración. Garantizamos una transición suave con mínimo impacto en la operativa de tu empresa.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFive">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            ¿Cómo garantizan la seguridad de nuestros datos?
+                        </button>
+                    </h2>
+                    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionFaq2">
+                        <div class="accordion-body">
+                            Implementamos múltiples capas de seguridad que incluyen firewalls de última generación, sistemas de detección y prevención de intrusiones, soluciones antivirus y anti-malware, cifrado de datos, autenticación multifactor y copias de seguridad regulares. Además, realizamos auditorías de seguridad periódicas y mantenemos actualizados todos los sistemas con los últimos parches de seguridad.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingSix">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                            ¿Puedo cambiar de plan según evolucionen mis necesidades?
+                        </button>
+                    </h2>
+                    <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#accordionFaq2">
+                        <div class="accordion-body">
+                            Sí, ofrecemos total flexibilidad para cambiar de plan según evolucionen las necesidades de tu empresa. Puedes actualizar o reducir tu plan en cualquier momento con un preaviso de 30 días. Nuestro equipo te asesorará sobre el plan más adecuado según el crecimiento y las necesidades específicas de tu negocio.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section mt-5 p-5 text-center">
+    <h2>¿Necesitas una solución personalizada?</h2>
+    <p class="lead">Contáctanos para diseñar un plan a medida que se adapte perfectamente a las necesidades de tu empresa.</p>
+    <a href="{{ url_for('contact') }}" class="btn btn-primary btn-lg mt-3">Solicitar Presupuesto</a>
+</div>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends 'layout.html' %}
+
+{% block title %}Contáctanos - Tartuski{% endblock %}
+
+{% block content %}
+<div class="contact-header text-center mb-5">
+    <h1 class="display-4">Contáctanos</h1>
+    <p class="lead">Estamos aquí para ayudarte con todas tus necesidades tecnológicas</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Envíanos un mensaje</h2>
+                <form method="POST" action="{{ url_for('contact') }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Nombre completo *</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Correo electrónico *</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Teléfono</label>
+                        <input type="tel" class="form-control" id="phone" name="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Asunto *</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Mensaje *</label>
+                        <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="privacy" required>
+                        <label class="form-check-label" for="privacy">Acepto la política de privacidad y el tratamiento de mis datos.</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enviar Mensaje</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Información de Contacto</h2>
+                <div class="contact-info">
+                    <div class="contact-item mb-4">
+                        <div class="contact-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h5>Dirección</h5>
+                            <p>Calle Principal 123, 28001 Madrid, España</p>
+                        </div>
+                    </div>
+                    <div class="contact-item mb-4">
+                        <div class="contact-icon">
+                            <i class="bi bi-telephone"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h5>Teléfono</h5>
+                            <p>+34 123 456 789</p>
+                            <p>+34 987 654 321 (Soporte técnico)</p>
+                        </div>
+                    </div>
+                    <div class="contact-item mb-4">
+                        <div class="contact-icon">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h5>Email</h5>
+                            <p>info@tartuski.com</p>
+                            <p>soporte@tartuski.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h5>Horario de Atención</h5>
+                            <p>Lunes a Viernes: 9:00 - 18:00</p>
+                            <p>Soporte técnico: 24/7 para clientes con plan Enterprise</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 class="mt-5 mb-3">Síguenos en redes sociales</h3>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="social-link"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12143.354760973503!2d-3.7037974302246107!3d40.41677007936502!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422997800a3c81%3A0xc436dec1618c2269!2sMadrid%2C%20Spain!5e0!3m2!1sen!2sus!4v1620120000000!5m2!1sen!2sus" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12 text-center mb-4">
+        <h2>Preguntas Frecuentes</h2>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <div class="accordion" id="accordionContact1">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingContactOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseContactOne" aria-expanded="true" aria-controls="collapseContactOne">
+                        ¿Cuánto tiempo tardarán en responder a mi consulta?
+                    </button>
+                </h2>
+                <div id="collapseContactOne" class="accordion-collapse collapse show" aria-labelledby="headingContactOne" data-bs-parent="#accordionContact1">
+                    <div class="accordion-body">
+                        Nos comprometemos a responder a todas las consultas en un plazo máximo de 24 horas laborables. Para consultas urgentes, recomendamos contactar directamente por teléfono.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingContactTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseContactTwo" aria-expanded="false" aria-controls="collapseContactTwo">
+                        ¿Ofrecen servicios fuera de Madrid?
+                    </button>
+                </h2>
+                <div id="collapseContactTwo" class="accordion-collapse collapse" aria-labelledby="headingContactTwo" data-bs-parent="#accordionContact1">
+                    <div class="accordion-body">
+                        Sí, ofrecemos servicios en toda España. Para servicios presenciales fuera de Madrid, aplicamos tarifas de desplazamiento. Muchos de nuestros servicios pueden realizarse de forma remota sin necesidad de desplazamiento.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="accordion" id="accordionContact2">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingContactThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseContactThree" aria-expanded="false" aria-controls="collapseContactThree">
+                        ¿Cómo puedo solicitar un presupuesto?
+                    </button>
+                </h2>
+                <div id="collapseContactThree" class="accordion-collapse collapse" aria-labelledby="headingContactThree" data-bs-parent="#accordionContact2">
+                    <div class="accordion-body">
+                        Puedes solicitar un presupuesto a través del formulario de contacto, indicando en el asunto "Solicitud de presupuesto" y detallando tus necesidades. También puedes llamarnos directamente o enviarnos un email a info@tartuski.com.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingContactFour">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseContactFour" aria-expanded="false" aria-controls="collapseContactFour">
+                        ¿Realizan visitas previas para evaluar necesidades?
+                    </button>
+                </h2>
+                <div id="collapseContactFour" class="accordion-collapse collapse" aria-labelledby="headingContactFour" data-bs-parent="#accordionContact2">
+                    <div class="accordion-body">
+                        Sí, realizamos visitas previas sin compromiso para evaluar tus necesidades y ofrecerte la mejor solución. Contáctanos para programar una visita con uno de nuestros consultores.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,75 +1,162 @@
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
 
-{% block title %} - Home{% endblock %}
-
-{% block styles %}
-{% endblock %}
+{% block title %}Tartuski - Servicios Informáticos Profesionales{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <div class="hero-content">
-        <h1>Soluciones Tecnológicas para tu Empresa</h1>
-        <p>Expertos en Help Desk, Telefonía VoIP, Firewall y Redes LAN</p>
-        <a href="/contactanos" class="btn">Solicitar Presupuesto</a>
+<div class="hero-section">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold">Soluciones Tecnológicas para tu Negocio</h1>
+            <p class="lead">En Tartuski ofrecemos servicios informáticos integrales para empresas y profesionales. Sistemas, redes, helpdesk, telefonía VoIP y soluciones en la nube.</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                <a href="{{ url_for('services') }}" class="btn btn-primary btn-lg px-4 me-md-2">Nuestros Servicios</a>
+                <a href="{{ url_for('contact') }}" class="btn btn-outline-primary btn-lg px-4">Contáctanos</a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <img src="{{ url_for('static', filename='img/hero-image.jpg') }}" alt="Servicios Informáticos" class="img-fluid rounded shadow">
+        </div>
     </div>
-</section>
+</div>
 
-<section class="services-overview">
-    <h2>Nuestros Servicios</h2>
-    <div class="services-container">
-        <div class="service-card">
-            <i class="fas fa-headset"></i>
-            <h3>Help Desk</h3>
-            <p>Soporte técnico remoto y presencial para resolver todas tus dudas.</p>
-            <a href="/servicios#helpdesk" class="btn-small">Más información</a>
-        </div>
-        <div class="service-card">
-            <i class="fas fa-phone-alt"></i>
-            <h3>Telefonía VoIP</h3>
-            <p>Instalación y gestión de sistemas de telefonía IP para una comunicación eficiente.</p>
-            <a href="/servicios#voip" class="btn-small">Más información</a>
-        </div>
-        <div class="service-card">
-            <i class="fas fa-shield-alt"></i>
-            <h3>Firewall</h3>
-            <p>Implementación y configuración de cortafuegos para proteger tu red empresarial.</p>
-            <a href="/servicios#firewall" class="btn-small">Más información</a>
-        </div>
-        <div class="service-card">
-            <i class="fas fa-network-wired"></i>
-            <h3>Redes LAN</h3>
-            <p>Diseño, instalación y puesta en marcha de redes locales seguras y eficientes.</p>
-            <a href="/servicios#lan" class="btn-small">Más información</a>
-        </div>
+<div class="row mt-5 pt-3">
+    <div class="col-12 text-center mb-4">
+        <h2 class="section-title">Nuestros Servicios Destacados</h2>
+        <p class="section-subtitle">Soluciones tecnológicas adaptadas a tus necesidades</p>
     </div>
-</section>
+</div>
 
-<section class="why-us">
-    <h2>¿Por qué elegirnos?</h2>
-    <div class="features-container">
-        <div class="feature">
-            <i class="fas fa-user-tie"></i>
-            <h3>Profesionales Certificados</h3>
-            <p>Nuestro equipo cuenta con certificaciones en las tecnologías más demandadas.</p>
-        </div>
-        <div class="feature">
-            <i class="fas fa-clock"></i>
-            <h3>Respuesta Rápida</h3>
-            <p>Garantizamos tiempos de respuesta mínimos para resolver tus incidencias.</p>
-        </div>
-        <div class="feature">
-            <i class="fas fa-chart-line"></i>
-            <h3>Soluciones Escalables</h3>
-            <p>Nuestras soluciones crecen con tu empresa, adaptándose a tus necesidades.</p>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100 service-card">
+            <div class="card-body text-center">
+                <div class="icon-wrapper mb-3">
+                    <i class="bi bi-hdd-network"></i>
+                </div>
+                <h3 class="card-title">Sistemas y Redes</h3>
+                <p class="card-text">Diseño, implementación y mantenimiento de infraestructuras de red y sistemas informáticos para empresas.</p>
+                <a href="{{ url_for('services') }}#sistemas" class="btn btn-outline-primary mt-3">Más información</a>
+            </div>
         </div>
     </div>
-</section>
+    <div class="col-md-4">
+        <div class="card h-100 service-card">
+            <div class="card-body text-center">
+                <div class="icon-wrapper mb-3">
+                    <i class="bi bi-headset"></i>
+                </div>
+                <h3 class="card-title">Helpdesk</h3>
+                <p class="card-text">Soporte técnico remoto y presencial para resolver incidencias y mantener tus equipos funcionando correctamente.</p>
+                <a href="{{ url_for('services') }}#helpdesk" class="btn btn-outline-primary mt-3">Más información</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 service-card">
+            <div class="card-body text-center">
+                <div class="icon-wrapper mb-3">
+                    <i class="bi bi-cloud"></i>
+                </div>
+                <h3 class="card-title">Soluciones Cloud</h3>
+                <p class="card-text">Migración a la nube, implementación de servicios cloud y optimización de recursos en entornos Azure y AWS.</p>
+                <a href="{{ url_for('services') }}#cloud" class="btn btn-outline-primary mt-3">Más información</a>
+            </div>
+        </div>
+    </div>
+</div>
 
-<section class="cta">
-    <div class="cta-content">
-        <h2>¿Listo para mejorar tu infraestructura tecnológica?</h2>
-        <p>Contáctanos hoy mismo y obtén un diagnóstico gratuito de tus necesidades.</p>
-        <a href="/contactanos" class="btn">Contactar Ahora</a>
+<div class="row mt-5 pt-3">
+    <div class="col-12 text-center mb-4">
+        <h2 class="section-title">¿Por qué elegirnos?</h2>
+        <p class="section-subtitle">Ventajas de trabajar con Tartuski</p>
     </div>
-</section>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="feature-box text-center">
+            <div class="feature-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <h4>Equipo Experto</h4>
+            <p>Profesionales certificados con amplia experiencia en el sector.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="feature-box text-center">
+            <div class="feature-icon">
+                <i class="bi bi-gear"></i>
+            </div>
+            <h4>Soluciones a Medida</h4>
+            <p>Adaptamos nuestros servicios a las necesidades específicas de tu empresa.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="feature-box text-center">
+            <div class="feature-icon">
+                <i class="bi bi-clock"></i>
+            </div>
+            <h4>Respuesta Rápida</h4>
+            <p>Atención inmediata y resolución eficiente de incidencias.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="feature-box text-center">
+            <div class="feature-icon">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            <h4>Seguridad Garantizada</h4>
+            <p>Protección de datos y sistemas con las últimas tecnologías.</p>
+        </div>
+    </div>
+</div>
+
+<div class="testimonials-section mt-5 py-5">
+    <div class="row">
+        <div class="col-12 text-center mb-4">
+            <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"Tartuski ha transformado nuestra infraestructura tecnológica. Su servicio de helpdesk es excepcional y siempre están disponibles cuando los necesitamos."</p>
+                </div>
+                <div class="testimonial-author">
+                    <h5>María Rodríguez</h5>
+                    <p>Directora de Operaciones, TechSolutions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"La migración a la nube que realizaron para nuestra empresa fue impecable. Ahora nuestros sistemas son más eficientes y hemos reducido costes significativamente."</p>
+                </div>
+                <div class="testimonial-author">
+                    <h5>Carlos Martínez</h5>
+                    <p>CEO, Innovatech</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <p>"El sistema de telefonía VoIP implementado por Tartuski ha mejorado enormemente nuestra comunicación interna y con clientes. Altamente recomendables."</p>
+                </div>
+                <div class="testimonial-author">
+                    <h5>Laura Sánchez</h5>
+                    <p>Gerente, Consultores Asociados</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section mt-5 p-5 text-center">
+    <h2>¿Listo para mejorar tu infraestructura tecnológica?</h2>
+    <p class="lead">Contáctanos hoy mismo y descubre cómo podemos ayudarte a optimizar tus sistemas informáticos.</p>
+    <a href="{{ url_for('contact') }}" class="btn btn-primary btn-lg mt-3">Solicitar Información</a>
+</div>
 {% endblock %}
