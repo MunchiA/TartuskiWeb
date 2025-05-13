@@ -114,6 +114,17 @@ a:hover {
   color: var(--color-primary-hover);
 }
 
+/* Services */
+.img-services{
+  max-height: 65%;
+  max-width: 65%;
+}
+
+.img-services-c{
+    max-height: 75%;
+    max-width: 75%;
+}
+
 /* Estilos de la sección hero */
 .hero-section {
   padding: 2rem 0;
