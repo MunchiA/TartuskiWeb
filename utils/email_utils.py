@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # Cargar variables de entorno
 load_dotenv()
 
-def enviar_correo_contacto(nombre, email, telefono, asunto, servicio, mensaje):
+def enviar_correo_contacto(nombre, email, telefono, asunto, mensaje):
     EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')
     EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
@@ -21,7 +21,6 @@ def enviar_correo_contacto(nombre, email, telefono, asunto, servicio, mensaje):
                 <li><strong>Email:</strong> {email}</li>
                 <li><strong>Teléfono:</strong> {telefono}</li>
                 <li><strong>Asunto:</strong> {asunto}</li>
-                <li><strong>Servicio de interés:</strong> {servicio}</li>
             </ul>
             <h3 style="color: #2d8feb;">Mensaje:</h3>
             <p>{mensaje}</p>
